@@ -1,0 +1,89 @@
+# Easticsearch Essential Training
+# Module 2 - Basic CRUD Operations on Elasticsearch
+
+## Create Index
+PUT /sales
+GET /_cat/indices?v
+
+## Create data
+PUT /sales/order/1
+{
+  "orderID":"1",
+  "orderAmount": 100
+}
+
+PUT /sales/order/2
+{
+  "orderID":"2",
+  "orderAmount": 200
+}
+
+# Retrieve data
+GET /sales/order/1
+GET /sales/order/2
+GET /sales/order/_search
+
+## Exercise: 
+
+PUT /customer
+GET /_cat/indices?v
+
+PUT /customer/_doc/1
+{
+  "name": "Ally",
+  "age": 30
+}
+
+PUT /customer/_doc/2
+{
+  "name": "Belinda",
+  "age": 25
+}
+
+PUT /customer/_doc/3	
+{
+  "name": "Jane",
+  "age": 35
+}
+
+GET /customer/_doc/_search
+
+# Modify data
+PUT /sales/order/1
+{
+  "orderAmount": 200
+}
+GET /sales/order/1
+
+# Update data 
+POST /sales/order/1/_update
+{
+  "doc" : {"orderAmount": 200}
+}
+GET /sales/order/1
+
+# Exercise: Update data 
+POST /customer/_doc/1/_update
+{
+  "doc": { "age": 31 }
+}
+
+POST /customer/_doc/2/_update
+{
+  "doc": { "age": 28 }
+}
+
+GET /customer/_doc/_search
+
+## Delete data
+DELETE /sales/order/1
+
+## Exercise: Delete data
+DELETE /customer/_doc/1
+
+## Delete index
+DELETE /sales
+
+# Exercise: Delete index
+DELETE /customer
+

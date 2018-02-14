@@ -1,0 +1,6 @@
+{ "index" : { "_index" : "my-test", "_type" : "my-type", "_id" : "1" } }
+{ "col1" : "val1"}
+{ "index" : { "_index" : "my-test", "_type" : "my-type", "_id" : "2" } }
+{ "col1" : "val2"}
+{ "index" : { "_index" : "my-test", "_type" : "my-type", "_id" : "1" } }
+{ "col1" : "val3" }

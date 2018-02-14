@@ -1,0 +1,381 @@
+# Easticsearch Essential Training
+# Module 5 - Analyzing Data
+
+## Aggregation - Group By
+GET bank/account/_search
+{
+  "size": 0,
+  "aggs": {
+    "states": {
+      "terms": {
+        "field": "state.keyword"
+      }
+    }
+  }
+}
+
+GET bank/account/_search
+{
+  "size": 0,
+  "aggs": {
+    "gender": {
+      "terms": {
+        "field": "gender.keyword"
+      }
+    }
+  }
+}
+
+GET /bank/_search
+{
+  "size": 0,
+  "aggs": {
+    "group_by_state": {
+      "terms": {
+        "field": "state.keyword"
+      }
+    }
+  }
+}
+
+## Ex: Group By
+GET bank/account/_search
+{
+  "size": 0,
+  "aggs": {
+    "gender": {
+      "terms": {
+        "field": "gender.keyword"
+      }
+    }
+  }
+}
+
+
+# Calculate average balance in each state
+GET bank/account/_search
+{
+  "size": 0,
+  "aggs": {
+    "states": {
+      "terms": {
+        "field": "state.keyword"
+      },
+      "aggs": {
+        "avg_bal": {
+          "avg": {
+            "field": "balance"
+          }
+        }
+      }
+    }
+  }
+}
+
+GET /bank/_search
+{
+  "size": 0,
+  "aggs": {
+    "group_by_state": {
+      "terms": {
+        "field": "state.keyword"
+      },
+      "aggs": {
+        "average_balance": {
+          "avg": {
+            "field": "balance"
+          }
+        }
+      }
+    }
+  }
+}
+
+## Ex: Group By Average
+GET bank/account/_search
+{
+  "size": 0,
+  "aggs": {
+    "gender": {
+      "terms": {
+        "field": "gender.keyword"
+      },
+      "aggs": {
+        "avg_bal": {
+          "avg": {
+            "field": "balance"
+          }
+        }
+      }
+    }
+  }
+}
+
+# Nested Aggregation
+GET bank/account/_search
+{
+  "size": 0,
+  "aggs": {
+    "states": {
+      "terms": {
+        "field": "state.keyword"
+      },
+      "aggs": {
+        "avg_bal": {
+          "avg": {
+            "field": "balance"
+          }
+        },
+        "gender":{
+          "terms": {
+            "field": "gender.keyword"
+          }
+        }
+      }
+    }
+  }
+}
+
+GET bank/account/_search
+{
+  "size": 0,
+  "aggs": {
+    "gender": {
+      "terms": {
+        "field": "gender.keyword"
+      },
+      "aggs": {
+        "avg_bal": {
+          "avg": {
+            "field": "balance"
+          }
+        },
+        "states":{
+          "terms": {
+            "field": "state.keyword"
+          }
+        }
+      }
+    }
+  }
+}
+
+# Filter Aggregation
+GET bank/account/_search
+{
+  "size": 0,
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {"state.keyword": "CA"}},
+        {"range": {"age": {"gt": 35}}}
+      ]
+    }
+  },
+  "aggs": {
+    "states": {
+      "terms": {
+        "field": "state.keyword"
+      }
+    }
+  }
+}
+
+## Exercise 1: Filter Aggregates
+GET bank/account/_search
+{
+  "size": 0,
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {"state.keyword": "CA"}},
+        {"range": {"age": {"gt": 35}}}
+      ]
+    }
+  },
+  "aggs": {
+    "states": {
+      "terms": {
+        "field": "state.keyword"
+      },
+      "aggs": {"avg_bal": {"avg": {"field": "balance"} }}
+    }
+  }
+}
+
+GET bank/account/_search
+{
+  "size": 0,
+  "query": {
+    "bool": {
+      "must": [
+        {"match": {"gender.keyword": "M"}},
+        {"range": {"age": {"gt": 35}}}
+      ]
+    }
+  },
+  "aggs": {
+    "gender": {
+      "terms": {
+        "field": "gender.keyword"
+      }
+    }
+  }
+}
+
+# You can also just filter the results
+GET bank/account/_search
+{
+  "size": 0,
+  "query": {
+    "match": {"state.keyword": "CA"}
+  },
+  "aggs": {
+    "over35":{
+      "filter": {
+        "range": {"age": {"gt": 35}}
+      },
+    "aggs": {"avg_bal": {"avg": {"field": "balance"} }}
+    }
+  }
+}
+
+# Exercise 2: Filter Aggregates
+GET /bank/_search
+{
+  "size": 0,
+  "aggs": {
+    "group_by_age": {
+      "range": {
+        "field": "age",
+        "ranges": [
+          {
+            "from": 20,
+            "to": 30
+          },
+          {
+            "from": 30,
+            "to": 40
+          },
+          {
+            "from": 40,
+            "to": 50
+          }
+        ]
+      },
+      "aggs": {
+        "group_by_gender": {
+          "terms": {
+            "field": "gender.keyword"
+          },
+          "aggs": {
+            "average_balance": {
+              "avg": {
+                "field": "balance"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+# Advanced Topics
+
+# Look at state avg and global average
+GET bank/account/_search
+{
+  "size": 0,
+  "aggs": {
+    "state_avg": {
+      "terms": {
+        "field": "state.keyword"
+      },
+      "aggs": {"avg_bal": {"avg": {"field": "balance"}}}
+    },
+    "global_avg": {
+      "global": {},
+      "aggs": {"avg_bal": {"avg": {"field": "balance"}}}
+    }
+  }
+}
+
+# Look at the percentiles for the balances
+GET bank/account/_search
+{
+  "size": 0,
+  "aggs": {
+    "pct_balances": {
+      "percentiles": {
+        "field": "balance",
+        "percents": [
+          1,
+          5,
+          25,
+          50,
+          75,
+          95,
+          99
+        ]
+      }
+    }
+  }
+}
+
+# Can also calculate High Dynamic Range (HDR) Historgram
+GET bank/account/_search
+{
+  "size": 0,
+  "aggs": {
+    "pct_balances": {
+      "percentiles": {
+        "field": "balance",
+        "percents": [
+          1,
+          5,
+          25,
+          50,
+          75,
+          95,
+          99
+        ],
+        "hdr": {
+          "number_of_significant_value_digits": 3
+        }
+      }
+    }
+  }
+}
+
+# We can use the percentile ranks agg for checking a individual values
+GET bank/account/_search
+{
+  "size": 0,
+  "aggs": {
+    "bal_outlier": {
+      "percentile_ranks": {
+        "field": "balance",
+        "values": [35000,50000],
+        "hdr": {
+          "number_of_significant_value_digits": 3
+        }
+      }
+    }
+  }
+}
+
+# Similarly we can create a histogram
+GET bank/account/_search
+{
+  "size": 0,
+  "aggs": {
+    "bals": {
+      "histogram": {
+        "field": "balance",
+        "interval": 500
+      }
+    }
+  }
+}
+

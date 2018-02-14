@@ -1,0 +1,178 @@
+# Easticsearch Essential Training
+# Module 3 - Uploading Data
+
+# Batch upload data from Console
+POST sales/order/_bulk
+{ "index" : {"_id" : "1"} }
+{ "orderAmount" : 100}
+{ "index" : {"_id" : "2"} }
+{ "orderAmount" : 200}
+{ "index" : {"_id" : "3"} }
+{ "orderAmount" : 300}
+
+# Retreive data
+GET sales/order/_search
+
+## Exercise : Batch processing
+POST /customer/_doc/_bulk
+{"index":{"_id":"1"}}
+{"name": "Ally" }
+{"index":{"_id":"2"}}
+{"name": "Belinda" }
+
+
+## Batch update data
+POST /sales/order/_bulk
+{"update":{"_id":"1"}}
+{"doc": { "orderAmount": "400" } }
+{"delete":{"_id":"2"}}
+
+# Exercise : Batch update data
+POST /customer/_doc/_bulk
+{"update":{"_id":"1"}}
+{"doc": { "name": "Jane" } }
+{"delete":{"_id":"2"}}
+
+# Exercise : Batch update data - 2
+{ "index" : { "_index" : "my-test-console", "_type" : "my-type", "_id" : "1" } }
+{ "col1" : "val1" }
+{ "index" : { "_index" : "my-test-console", "_type" : "my-type", "_id" : "2" } }
+{ "col1" : "val2"}
+{ "index" : { "_index" : "my-test-console", "_type" : "my-type", "_id" : "3" } }
+{ "col1" : "val3" }
+
+GET /my-test-console/my-type/1
+
+# Create File with Requests (make sure to include new line at end of file)
+vi reqs
+{ "index" : { "_index" : "my-test", "_type" : "my-type", "_id" : "1" } }
+{ "col1" : "val1"}
+{ "index" : { "_index" : "my-test", "_type" : "my-type", "_id" : "2" } }
+{ "col1" : "val2"}
+{ "index" : { "_index" : "my-test", "_type" : "my-type", "_id" : "1" } }
+{ "col1" : "val3" }
+
+# Bulk upload data from file ising CURL
+curl -s -H "Content-Type: application/x-ndjson" -XPOST localhost:9200/_bulk --data-binary "@reqs"; echo
+
+# Check Kibana
+GET /my-test
+GET /my-test/my-type/1
+
+# Inspect Accounts.json
+head accounts.json
+
+# Exercise: Bulk upload data from file
+# Load via curl, notice the endpoint and type
+curl -H 'Content-Type: application/x-ndjson' -XPOST 'localhost:9200/bank/account/_bulk' --data-binary @accounts.json
+
+
+# check inside ES
+GET /_cat/indices
+GET /bank
+
+# set index pattern in Kibana
+Management > Uncheck time-based events > bank
+
+# View on left to see properties
+
+# Add mapping for lat/lon geo properties for logs
+PUT /logstash-2015.05.18
+{
+  "mappings": {
+    "log": {
+      "properties": {
+        "geo": {
+          "properties": {
+            "coordinates": {
+              "type": "geo_point"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+# Create two more to simulate daily logs
+PUT /logstash-2015.05.19
+{
+  "mappings": {
+    "log": {
+      "properties": {
+        "geo": {
+          "properties": {
+            "coordinates": {
+              "type": "geo_point"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+PUT /logstash-2015.05.20
+{
+  "mappings": {
+    "log": {
+      "properties": {
+        "geo": {
+          "properties": {
+            "coordinates": {
+              "type": "geo_point"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+# Check out structure of log data
+head logs.jsonl
+
+# Import log files
+curl -H 'Content-Type: application/x-ndjson' -XPOST 'localhost:9200/_bulk?pretty' --data-binary @logs.jsonl
+
+# Check ES for data
+GET /_cat/indices/logstash-*
+
+# Change default index pattern in Kibana
+
+# Load Shakespeare data (download from elastic or find in the Exercise Files)
+# Check out shakespeare.json
+head shakespeare.json
+
+# Shakespeare Schema
+{
+    "line_id": INT,
+    "play_name": "String",
+    "speech_number": INT,
+    "line_number": "String",
+    "speaker": "String",
+    "text_entry": "String",
+}
+
+# Create Shakespeare index with data types
+PUT /shakespeare
+{
+ "mappings" : {
+  "_default_" : {
+   "properties" : {
+    "speaker" : {"type": "keyword" },
+    "play_name" : {"type": "keyword" },
+    "line_id" : { "type" : "integer" },
+    "speech_number" : { "type" : "integer" }
+   }
+  }
+ }
+}
+
+# Load Shakespeare data
+curl -H 'Content-Type: application/x-ndjson' -XPOST 'localhost:9200/shakespeare/_bulk?pretty' --data-binary @shakespeare.json
+
+# Check out index in ES
+GET /shakespeare
+GET /_cat/indices?v
+
+
+

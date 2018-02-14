@@ -1,0 +1,11 @@
+# Easticsearch Essential Training
+# Module 1 - Get Started on Elasticsearch
+
+## Cluster Health Check
+GET /_cat/health?v
+
+## List Nodes
+GET /_cat/nodes?v
+
+## List Indices
+GET /_cat/indices?v
