@@ -7,6 +7,8 @@ The course outline can be found in
 
 https://www.tertiarycourses.com.sg/elasticsearch-essential-training.html
 
+https://www.tertiarycourses.com.my/elasticsearch-essential-training-malaysia.html
+
 <p><strong>Module 1: Get Started on ElasticSearch and Kibana</strong></p>
 <ul>
 <li>Elastic ELK Stack Family</li>
